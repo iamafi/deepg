@@ -5,52 +5,59 @@ DeepG is state-of-the-art system for certification of robustness of neural netwo
 The method is based on our [NeurIPS 2019](https://files.sri.inf.ethz.ch/website/papers/neurips19-deepg.pdf) paper and repository contains all code necessary to reproduce the results from the paper.
 The system is developed at the [SRI Lab, Department of Computer Science, ETH Zurich](https://www.sri.inf.ethz.ch/) as part of the [Safe AI project](http://safeai.ethz.ch/).
 
-
+>However, the initial tutorial is quite old, so I've provided an updated version. If you encounter any issues during running these commands, feel free to reach out to me on Slack or via email `m.ziyamova@yonsei.ac.kr`. Please note that I have also modified parts of the code to ensure everything works smoothly, even though you may still see many warnings :D
 ## Setup instructions
 
 Clone this repository:
 
 ```bash
-$ git clone https://github.com/eth-sri/deepg
+git clone https://github.com/iamafi/deepg.git
 ```
 
 Download Gurobi, update environment variables and install C++ bindings:
 
+>But before that you should obtain Gurobi Free Academic License. You can do this by using your university's network.
+
 ```bash
-$ wget https://packages.gurobi.com/8.1/gurobi8.1.1_linux64.tar.gz
-$ tar -xzvf gurobi8.1.1_linux64.tar.gz
-$ export GUROBI_HOME="$(pwd)/gurobi811/linux64"
-$ export PATH="${PATH}:${GUROBI_HOME}/bin"
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:${GUROBI_HOME}/lib
-$ cd gurobi811/linux64/src/build
-$ make
-$ cp libgurobi_c++.a ../../lib/
-$ sudo cp ../../lib/libgurobi81.so /usr/lib
-$ cd ../../../../
+wget https://packages.gurobi.com/9.1/gurobi9.1.0_linux64.tar.gz
+tar -xzvf gurobi9.1.0_linux64.tar.gz
+rm gurobi9.1.0_linux64.tar.gz
+export GUROBI_HOME="$(pwd)/gurobi910/linux64"
+export PATH="${PATH}:${GUROBI_HOME}/bin"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:${GUROBI_HOME}/lib
+grbgetkey <your key>
+cd gurobi910/linux64/src/build
+make
+cp libgurobi_c++.a ../../lib/
+sudo cp ../../lib/libgurobi91.so /usr/lib
+cd ../../../../
 ```
+>Please note that you may need to set up environment variables in every new session, unless you add them to the list of global environment variables.
 
 Now you should be able to compile DeepG:
 
-```
-$ cd deepg/code
-$ mkdir build
-$ make deepg_constraints
+```bash
+cd deepg/code
+mkdir build
+make deepg_constraints
 ```
 
 Next, create a virtual environment, install Gurobi Python bindings and other required packages:
 
 ```bash
-$ virtualenv venv
-$ source venv/bin/activate
-$ (venv) cd ../../gurobi811/linux64
-$ (venv) python setup.py install
+virtualenv venv
+source venv/bin/activate
+cd ..    # it's deepg folder
+pip install -r requirements.txt
 ```
+>Don't forget to activate virtual environment in new sessions.
+
 Next, we install ERAN. Note that this is a fork of official [ERAN](https://github.com/eth-sri/eran/) analyzer.
 As of now, ERAN will run only on CPU. GPU support will be added soon. The outputs will be the same, just the timing will be improved.
-```
-$ (venv) cd ../ERAN/
-$ (venv) ./install.sh
-$ (venv) pip3 install -r requirements.txt
+```bash
+cd ERAN/
+sudo ./install.sh
+pip3 install -r requirements.txt
 ```
 
 
@@ -60,17 +67,16 @@ As an example, we will certify that MNIST network is robust to rotation between 
 First, we need to generate the constraints which capture the above rotation:
 
 ```bash
-cd code
+cd ../code
 ./build/deepg_constraints examples/example1
 ```
 
 Then we need to download the network and run the verifier:
 
 ```bash
-$ source venv/bin/activate
-$ (venv) cd ERAN/tf-verify
-$ (venv) wget https://files.sri.inf.ethz.ch/deepg/networks/mnist_1_rotation.pyt
-$ (venv) python deepg.py --net mnist_1_rotation.pyt --dataset mnist --data_dir ../../code/examples/example1 --num_params 1 --num_tests 1
+cd ../ERAN/tf_verify
+wget https://files.sri.inf.ethz.ch/deepg/networks/mnist_1_rotation.pyt
+python deepg.py --net mnist_1_rotation.pyt --dataset mnist --data_dir ../../code/examples/example1 --num_params 1 --num_tests 1
 ```
 
 ## Format of configuration file
@@ -102,8 +108,10 @@ Parameter name and value are always separated by spaces. You can look at provide
 In order to reproduce the experiments from our paper, please download and unzip the constraints and configurations used in our experiments:
 
 ```bash
-$ wget https://files.sri.inf.ethz.ch/deepg/constraints.zip
-$ unzip constraints.zip
+cd ../..  # it's deepg folder
+wget https://files.sri.inf.ethz.ch/deepg/constraints.zip
+unzip constraints.zip
+rm constraints.zip
 ```
 
 Each folder in folder `constraints` is named after one of the experiments in our paper. It contains constraints for 100 images.
@@ -111,18 +119,20 @@ To perform certification, you need to download the network with the same name as
 Here is an example how to reproduce the results for the experiment with MNIST and translation:
 
 ```bash
-$ source venv/bin/activate
-$ (venv) cd ERAN/tf-verify
-$ (venv) wget https://files.sri.inf.ethz.ch/deepg/networks/mnist_2_translation.pyt
-$ (venv) python deepg.py --net mnist_2_translation.pyt --dataset mnist --data_dir ../../constraints/mnist_2_translation --num_params 2 --num_tests 100
+cd ERAN/tf_verify
+wget https://files.sri.inf.ethz.ch/deepg/networks/mnist_2_translation.pyt
+python deepg.py --net mnist_2_translation.pyt --dataset mnist --data_dir ../../constraints/mnist_2_translation --num_params 2 --num_tests 100
 ```
 
 You can also reproduce the constraints by running DeepG yourself (it will take some time). For example, the command for MNIST and translation is:
 
 ```bash
-$ cd code
+$ cd ../../code
 $ ./build/deepg_constraints ../constraints/mnist_2_translation
 ```
+
+### Mini-note
+>I hope you find this tutorial helpful. Once again, feel free to reach out to me if you have any questions. Happy coding!
 
 Citing this work
 ---------------------
