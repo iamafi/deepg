@@ -4,13 +4,15 @@ import os
 import copy
 import numpy as np
 import sys
-import tensorflow as tf
 from read_net_file import read_net
 sys.path.insert(0, '../ELINA/python_interface/')
 from eran import ERAN
 from elina_coeff import *
 from elina_linexpr0 import *
 import time
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 
 EPS = 10**(-9)
 n_rows, n_cols, n_channels = 0, 0, 0

@@ -1,13 +1,11 @@
 '''
 @author: Adrian Hoffmann
 '''
-import tensorflow as tf
 import numpy as np
 from tensorflow.python.keras.engine.sequential import Sequential
-from tensorflow.python.framework import graph_util
-
-
-
+from tensorflow.compat.v1 import graph_util
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 
 def tensorshape_to_intlist(tensorshape):
