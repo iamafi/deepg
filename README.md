@@ -57,7 +57,6 @@ As of now, ERAN will run only on CPU. GPU support will be added soon. The output
 ```bash
 cd ERAN/
 sudo ./install.sh
-pip3 install -r requirements.txt
 ```
 
 
@@ -127,8 +126,8 @@ python deepg.py --net mnist_2_translation.pyt --dataset mnist --data_dir ../../c
 You can also reproduce the constraints by running DeepG yourself (it will take some time). For example, the command for MNIST and translation is:
 
 ```bash
-$ cd ../../code
-$ ./build/deepg_constraints ../constraints/mnist_2_translation
+cd ../../code
+./build/deepg_constraints ../constraints/mnist_2_translation
 ```
 
 ### Mini-note
